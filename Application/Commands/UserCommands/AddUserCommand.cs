@@ -1,0 +1,21 @@
+﻿using Application.Utility;
+using Domain.DTOs.UserDTOs;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Application.Commands.UserCommands
+{
+    public class AddUserCommand :  IRequest<ApiResponse<UserResponse>>
+    {
+        public UserRequest UserRequest { get; set; }    
+
+        public AddUserCommand(UserRequest userRequest)
+        {
+            UserRequest = userRequest;  
+        }
+    }
+}
