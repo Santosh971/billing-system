@@ -1,4 +1,6 @@
-﻿using Domain.Models;
+﻿using Domain.DTOs.InvoiceItemDTOs;
+using Domain.DTOs.UserDTOs;
+using Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -15,7 +17,7 @@ namespace Domain.DTOs.InvoiceDTOs
         [ForeignKey("UserId")]
         public int? UserId { get; set; }
 
-        public User? User { get; set; }
+        public UserRequest? UserRequest { get; set; }
 
         public DateTime? CreatedAt { get; set; }
 
@@ -25,5 +27,9 @@ namespace Domain.DTOs.InvoiceDTOs
 
         public int? ProductId { get; set; }
         public int? Quantity { get; set; }
+
+
+        //List of products 
+        public List<InvoiceItemRequest> InvoiceItems { get; set; }  
     }
 }

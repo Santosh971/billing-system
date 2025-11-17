@@ -13,7 +13,7 @@ namespace Application.Mappers
     public class InvoiceMapper
     {
        
-        public static InvoiceResponse MapToInvoiceResponse(Invoice invoice, List<InvoiceItem>items)
+        public static InvoiceResponse MapToInvoiceResponse(Invoice invoice,User user, List<InvoiceItem>items)
         {
             InvoiceResponse invoiceResponse = new InvoiceResponse();
 
@@ -27,6 +27,14 @@ namespace Application.Mappers
             {
                invoiceResponse.InvoiceItemResponses = Mappers.InvoiceItemMapper.MapToInvoiceItemResponseList(items);
             }
+
+            if (user != null) 
+            {
+               invoiceResponse.UserResponse = Mappers.UserMapper.MapToUserResponse(user);    
+            }
+
+
+
 
             return invoiceResponse;
         }

@@ -1,4 +1,5 @@
 ﻿using Domain.DTOs.InvoiceItemDTOs;
+using Domain.DTOs.UserDTOs;
 using Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Domain.DTOs.InvoiceDTOs
         [ForeignKey("UserId")]
         public int? UserId { get; set; }
 
-        public User? User { get; set; }
+        public UserResponse? UserResponse { get; set; }
 
         public DateTime? CreatedAt { get; set; }
 

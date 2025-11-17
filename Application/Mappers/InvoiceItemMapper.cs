@@ -1,5 +1,6 @@
 ﻿using Domain.DTOs.InvoiceDTOs;
 using Domain.DTOs.InvoiceItemDTOs;
+using Domain.DTOs.ProductDTOs;
 using Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -21,6 +22,11 @@ namespace Application.Mappers
             invoiceItemResponse.UnitPrice = invoiceItem.UnitPrice;
             invoiceItemResponse.SubTotal = invoiceItem.SubTotal;
 
+            if (invoiceItem.Product != null)
+            {
+                var productResponse = Mappers.ProductMapper.MapToProductResponse(invoiceItem.Product);
+                invoiceItemResponse.ProductResponse = productResponse;
+            }
             return invoiceItemResponse;
         }
 
@@ -39,6 +45,12 @@ namespace Application.Mappers
                 invoiceItemResponse.Quantity = invoiceItem.Quantity;
                 invoiceItemResponse.UnitPrice = invoiceItem.UnitPrice;
                 invoiceItemResponse.SubTotal = invoiceItem.SubTotal;
+
+                if(invoiceItem.Product != null)
+                {
+                   var productResponse = Mappers.ProductMapper.MapToProductResponse(invoiceItem.Product);
+                    invoiceItemResponse.ProductResponse = productResponse;
+                }
 
                 lstInvoiceItemResponses.Add(invoiceItemResponse);
             }

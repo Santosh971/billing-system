@@ -1,10 +1,13 @@
+
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using QuestPDF.Infrastructure;
 using WebApiController.Properties.MediatorService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
+// Add this line before building the app
+QuestPDF.Settings.License = LicenseType.Community;
 // Add services to the container.
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -34,18 +37,14 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-
-//Enable Swagger
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseAuthorization();
+app.UseCors("AllowAll");
+
+// remove https redirect
+// app.UseHttpsRedirection();
 
 app.MapControllers();
 

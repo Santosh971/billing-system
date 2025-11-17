@@ -34,55 +34,60 @@ namespace Application.Handlers.InvoiceHandlers
                 {
                     return new ApiResponse<InvoiceResponse>(null, HttpStatusCode.BadRequest, "User Not Exist for Create Invoice", 1);
                 }
-                
-                var product  = await context.Products.Where(p=>p.ProductId == request.InvoiceRequest.ProductId).FirstOrDefaultAsync();
 
-                decimal? totalAmount = 0;
-                if (request.InvoiceRequest.Quantity == 0)
-                {
-                    totalAmount = product?.Price * 1;
-                }
-                else 
-                {
-                    totalAmount = product?.Price * request.InvoiceRequest.Quantity;
-                }
-
+             
 
                 //Create Invoice
 
                 Invoice invoice = new Invoice();
 
                 invoice.UserId = request.InvoiceRequest.UserId;
-                invoice.CreatedAt = DateTime.Now;
-                invoice.TotalAmount = totalAmount;
-                invoice.PaymentMode = "cash";
+                invoice.CreatedAt = DateTime.Now;                
 
                 context.Invoices.Add(invoice);
-                await context.SaveChangesAsync();   
+                await context.SaveChangesAsync();
+
+                decimal? totalAmount = 0;
+                foreach (var invoiceItem in request.InvoiceRequest.InvoiceItems)
+                {
+                    var product = await context.Products.Where(p => p.ProductId == invoiceItem.ProductId).FirstOrDefaultAsync();
+
+                    totalAmount = totalAmount + ( product?.Price * invoiceItem.Quantity);
 
 
-                //Add Invoice Item
+                    //Add Invoice Item
 
-                InvoiceItem item = new InvoiceItem();    
+                    InvoiceItem item = new InvoiceItem();
 
-                item.InvoiceId = invoice.InvoiceId;
-                item.ProductId = request.InvoiceRequest?.ProductId;
-                item.Quantity = request.InvoiceRequest?.Quantity ?? 1;
-                item.UnitPrice = product?.Price;
-                item.SubTotal = totalAmount;
+                    item.InvoiceId = invoice.InvoiceId;
+                    item.ProductId = invoiceItem?.ProductId;
+                    item.Quantity = invoiceItem?.Quantity;
+                    item.UnitPrice = product?.Price;
+                    item.SubTotal = invoiceItem?.Quantity * product?.Price;
 
+                    context.invoiceItems.Add(item);
 
-                context.invoiceItems.Add(item);
-                await context.SaveChangesAsync();   
+                    product.StockQuantity = product.StockQuantity - invoiceItem?.Quantity;  
+                    await context.SaveChangesAsync();
+                }
+
+                
+           
+                    invoice.TotalAmount = totalAmount;
+                    invoice.PaymentMode = "cash";
+
+                    await context.SaveChangesAsync();
 
 
                 //Return Invoice response
 
-                var invoiceItems = await context.invoiceItems.Where(it=>it.InvoiceId == invoice.InvoiceId).ToListAsync();
 
-                var invoiceResponse = Mappers.InvoiceMapper.MapToInvoiceResponse(invoice, invoiceItems);
+                var invoiceItems = await context.invoiceItems.Where(it => it.InvoiceId == invoice.InvoiceId).Include(it => it.Product).ToListAsync();
+
+                var invoiceResponse = Mappers.InvoiceMapper.MapToInvoiceResponse(invoice, user, invoiceItems);
 
                 lstInvoiceResponse.Add(invoiceResponse);
+
 
                 return new ApiResponse<InvoiceResponse>(lstInvoiceResponse, HttpStatusCode.Created, "Item Purchase And Invoice Created", 0);
             }
